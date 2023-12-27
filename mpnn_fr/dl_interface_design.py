@@ -98,10 +98,16 @@ class sample_features():
         self.chains = list( OrderedDict.fromkeys( [ self.pose.pdb_info().chain(i) for i in range1( self.pose.total_residue() ) ] ) )
 
         # Create the fixed res dict, this will be input to ProteinMPNN
-        self.fixed_res = {
-            self.chains[0]: fixed_list,
-            self.chains[1]: []
-        }
+        # if there is more than then fix the first one
+        if len(set(self.chains)) > 1:
+            self.fixed_res = {
+                self.chains[0]: fixed_list,
+                self.chains[1]: []
+            }
+        else:
+            self.fixed_res = {
+                self.chains[0]: fixed_list,
+            }
     
     def thread_mpnn_seq(self, binder_seq):
         '''
@@ -167,9 +173,9 @@ class ProteinMPNN_runner():
 
         # Configs for the FastRelax cycles
         xml = os.path.join(script_dir, 'RosettaFastRelaxUtil.xml')
+        # objs = protocols.constraint_movers.ResidueTypeConstraintMover()
         objs = protocols.rosetta_scripts.XmlObjects.create_from_file(xml)
-
-        self.FastRelax = objs.get_mover('FastRelax')
+        self.mover = objs.get_mover('FastRelax')
 
         self.relax_cycles = args.relax_cycles
 
@@ -181,8 +187,8 @@ class ProteinMPNN_runner():
         relaxT0 = time.time()
 
         print('Running FastRelax')
-
-        self.FastRelax.apply(sample_feats.pose)
+        breakpoint()
+        self.mover.apply(sample_feats.pose)
 
         print(f"Completed one cycle of FastRelax in {int(time.time()) - relaxT0} seconds")
 
