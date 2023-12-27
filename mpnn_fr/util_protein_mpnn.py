@@ -252,7 +252,10 @@ def generate_sequences( model, device, feature_dict, arg_dict, masked_chains, vi
     with torch.no_grad():
 
         batch_clones = [copy.deepcopy( feature_dict ) for i in range(arg_dict['BATCH_COPIES'])]
-        chain_id_dict = { feature_dict['name'] : ( masked_chains, visible_chains ) } # Masked, visible is the order, I think - Nate
+        if feature_dict['num_of_chains'] == 1: 
+          chain_id_dict = None
+        else:
+          chain_id_dict = { feature_dict['name'] : ( masked_chains, visible_chains ) } # Masked, visible is the order, I think - Nate
 
         X, S, mask, lengths, chain_M, chain_encoding_all, chain_list_list, visible_list_list, masked_list_list, masked_chain_length_list_list, chain_M_pos, omit_AA_mask, residue_idx, dihedral_mask, tied_pos_list_of_lists_list, pssm_coef, pssm_bias, pssm_log_odds_all, bias_by_res_all, tied_beta= tied_featurize(
                 batch_clones, 
